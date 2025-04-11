@@ -17,27 +17,27 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/Divyanshu03chauhan103/MavenAnsibleWebApp.git', branch: 'main'
-            }
-        }
-
         stage('Build') {
             steps {
-                sh 'mvn clean package'  // Run Maven build
+                dir("${env.WORKSPACE}") {
+                    sh 'mvn clean package'  // Run Maven build
+                }
             }
         }
 
         stage('Archive') {
             steps {
-                archiveArtifacts artifacts: 'target/*.war', fingerprint: true
+                dir("${env.WORKSPACE}") {
+                    archiveArtifacts artifacts: 'target/*.war', fingerprint: true
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'ansible-playbook ansible/playbook.yml -i ansible/hosts.ini'
+                dir("${env.WORKSPACE}") {
+                    sh 'ansible-playbook ansible/playbook.yml -i ansible/hosts.ini'
+                }
             }
         }
     }
